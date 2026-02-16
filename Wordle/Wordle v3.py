@@ -5,7 +5,7 @@
 #imports
 import random
 import sys
-from word_list_file import word_options_as_list
+from Wordle.word_list_file import word_options_as_list
 
 #Here is where it will check that the user wants to play
 def play():
