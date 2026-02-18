@@ -27,7 +27,7 @@ def computer_as_word(word_options_as_list):
     computer_choice = random.choice(word_options_as_list)
     return computer_choice
 
-#Here is where I would like to add the choice and the time of said choice into a separate file
+#Here is where (it doesn't work yet) I would like to add the choice and the time of said choice into a separate file
 def keep_track_of_when_used(computer_choice, most_recent_words):
     most_recent_words[computer_choice] = datetime.now().strftime("%Y-%m-%d %H:%M")
     return most_recent_words
