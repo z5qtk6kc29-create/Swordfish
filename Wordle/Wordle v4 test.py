@@ -23,6 +23,32 @@ def play():
         print("\nThat is not one of the options, please choose yes or no\n")
         play()
 
+#Here is where the computer chooses its word
+
+computer_choice = "gouge"
+
+
+#Here is where the computer will evaluate if the word is already in the json and pick a new word if so
+def computer_word_check(computer_choice):
+    with open("recent_words.json", "r") as file:
+        if computer_choice in file:
+            computer_choice = "think"
+        else:
+            return computer_choice
+
+#Here is where I would like to add the choice and the time of said choice into a separate file
+def keep_track_of_when_used(computer_choice):
+    most_recent_words[computer_choice] = datetime.now().strftime("%Y-%m-%d")
+    with open('recent_words.json', 'w') as file:
+        json.dump(most_recent_words, file, indent=4)
+
+#Here is where it will load existing data to file, or start with empty dict
+if os.path.exists('recent_words.json'):
+    with open('recent_words.json', 'r') as file:
+        most_recent_words = json.load(file)
+else:
+    most_recent_words = {}
+
 #Here is where it will scan the json and remove anything older than 90 days from the list
 def cleanup_data(most_recent_words):
     three_months_ago = datetime.now() - timedelta(days=90)
@@ -41,25 +67,6 @@ def cleanup_data(most_recent_words):
                 
             return filtered_data
     return {}
-
-#Here is where the computer chooses its word
-def computer_as_word(word_options_as_list):
-    computer_choice = random.choice(word_options_as_list)
-    return computer_choice
-
-#Here is where I would like to add the choice and the time of said choice into a separate file
-def keep_track_of_when_used(computer_choice):
-    most_recent_words[computer_choice] = datetime.now().strftime("%Y-%m-%d")
-    with open('recent_words.json', 'w') as file:
-        json.dump(most_recent_words, file, indent=4)
-    return most_recent_words
-
-#Here is where it will load existing data to file, or start with empty dict
-if os.path.exists('recent_words.json'):
-    with open('recent_words.json', 'r') as file:
-        most_recent_words = json.load(file)
-else:
-    most_recent_words = {}
 
 #Here is where the word gets split into a list
 def computer(computer_choice):
@@ -98,11 +105,9 @@ def repeat_two_to_six(word_options_as_list, computer_list, computer_choice):
 
 #Here is where I call the functions to actually happen
 play()
-cleanup_data(most_recent_words)
-computer_choice = computer_as_word(word_options_as_list)
-if computer_choice in most_recent_words:
-    computer_choice = computer_as_word(word_options_as_list)
+computer_choice = computer_word_check(computer_choice)
 most_recent_words = keep_track_of_when_used(computer_choice)
+cleanup_data(most_recent_words)
 computer_list = computer(computer_choice)
 user_list = user(word_options_as_list)
 check_win(computer_list, user_list)
