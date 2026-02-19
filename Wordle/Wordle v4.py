@@ -5,8 +5,9 @@
 #imports
 import random
 import sys
+import json
+import os
 from word_list_file import word_options_as_list
-from recent_words import most_recent_words
 from datetime import datetime
 
 #Here is where it will check that the user wants to play
@@ -27,10 +28,18 @@ def computer_as_word(word_options_as_list):
     computer_choice = random.choice(word_options_as_list)
     return computer_choice
 
-#Here is where (it doesn't work yet) I would like to add the choice and the time of said choice into a separate file
-def keep_track_of_when_used(computer_choice, most_recent_words):
+#Here is where I would like to add the choice and the time of said choice into a separate file
+def keep_track_of_when_used(computer_choice):
     most_recent_words[computer_choice] = datetime.now().strftime("%Y-%m-%d %H:%M")
-    return most_recent_words
+    with open('recent_words.json', 'w') as file:
+        json.dump(most_recent_words, file, indent=4)
+
+#Here is where it will load existing data to file, or start with empty dict
+if os.path.exists('recent_words.json'):
+    with open('recent_words.json', 'r') as file:
+        most_recent_words = json.load(file)
+else:
+    most_recent_words = {}
 
 #Here is where the word gets split into a list
 def computer(computer_choice):
@@ -70,7 +79,7 @@ def repeat_two_to_six(word_options_as_list, computer_list, computer_choice):
 #Here is where I call the functions to actually happen
 play()
 computer_choice = computer_as_word(word_options_as_list)
-keep_track_of_when_used(computer_choice, most_recent_words)
+most_recent_words = keep_track_of_when_used(computer_choice)
 computer_list = computer(computer_choice)
 user_list = user(word_options_as_list)
 check_win(computer_list, user_list)
