@@ -1,4 +1,4 @@
-#Wordle.py
+#Swordfish v3.py
 
 #This version includes a separate space for the word list and also reuses code much more effectively
 

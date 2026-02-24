@@ -1,4 +1,4 @@
-#Wordle.py
+#Swordfish v5.py
 
 #This version includes details of what letters have been used or not
 

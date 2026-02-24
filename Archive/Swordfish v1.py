@@ -1,4 +1,4 @@
-#Wordle.py
+#Swordfish v1.py
 
 #This is a stable version that works well as of 2/11
 

@@ -1,4 +1,4 @@
-#Wordle.py
+#Swordfish v6.py
 
 #This version includes changes to the font color instead of spelling out the letters place
 

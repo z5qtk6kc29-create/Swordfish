@@ -1,4 +1,4 @@
-#Wordle.py
+#Swordfish v4.py
 
 #This version includes a way of tracking words and exporting them into a json file. It can also check if the word chosen is in the json file and remove items from the json file after three months. Also some bug fixes with multiple attempts with words that are not in the list
 
