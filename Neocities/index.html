@@ -158,7 +158,7 @@
             <li>coding</li>
             <li>spanish</li>
             <li>faith</li>
-            <li>other websites</li>
+            <li>links</li>
             <li>chat/exit</li>
         </ul>
     </div>
@@ -192,81 +192,133 @@ See options for commands on the left.</div>
         </div>
     </div>
 
-    <script>
-        const input = document.getElementById('command-input');
-        const output = document.getElementById('output');
-        const cboxContainer = document.getElementById('cbox-container');
-        let isChatOpen = false;
+<script>
+    const input = document.getElementById('command-input');
+    const output = document.getElementById('output'); // Your HTML uses 'output'
+    const cboxContainer = document.getElementById('cbox-container');
+    let isChatOpen = false;
 
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const val = input.value.trim();
-                handleCommand(val);
-                input.value = '';
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const val = input.value.trim();
+            handleCommand(val);
+            input.value = '';
+        }
+    });
+
+    function printToTerminal(text) {
+    const line = document.createElement('div');
+    line.style.whiteSpace = 'pre-wrap'; // Keeps your formatting clean
+    output.appendChild(line);
+
+    let i = 0;
+    const speed = 20;
+
+    // This creates a temporary element to hold the full HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    
+    // We get a list of all text nodes and elements to type them out
+    const nodes = Array.from(tempDiv.childNodes);
+    let currentNodeIndex = 0;
+    let charIndex = 0;
+
+    function typeNext() {
+        if (currentNodeIndex < nodes.length) {
+            const node = nodes[currentNodeIndex];
+
+            if (node.nodeType === Node.TEXT_NODE) {
+                // It's plain text, type it character by character
+                if (charIndex < node.textContent.length) {
+                    line.innerHTML += node.textContent.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeNext, speed);
+                } else {
+                    charIndex = 0;
+                    currentNodeIndex++;
+                    typeNext();
+                }
+            } else {
+                // It's an HTML element (like your <a> link)
+                // We add the whole element at once so it works perfectly
+                line.appendChild(node.cloneNode(true));
+                currentNodeIndex++;
+                // Move to next node immediately
+                typeNext();
             }
-        });
-
-        function printToTerminal(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            output.appendChild(div);
             output.scrollTop = output.scrollHeight;
         }
+    }
 
-        function handleCommand(rawCmd) {
-            const cmd = rawCmd.toLowerCase();
-            if (cmd === "") return;
+    typeNext();
+}
 
-            // If we are in "chat mode", the terminal input still works for the 'exit' command
-            if (isChatOpen) {
-                if (cmd === 'exit') {
-                    isChatOpen = false;
-                    cboxContainer.style.display = 'none';
-                    output.style.display = 'block';
-                    printToTerminal("% exit");
-                    printToTerminal("Session closed. Returning to terminal...");
-                } else {
-                    // Just clear the line or ignore other commands while chatting
-                }
-                return;
+    function handleCommand(rawCmd) {
+        const cmd = rawCmd.toLowerCase();
+        if (cmd === "") return;
+
+        if (isChatOpen) {
+            if (cmd === 'exit') {
+                isChatOpen = false;
+                cboxContainer.style.display = 'none';
+                output.style.display = 'block';
+                printToTerminal("% exit");
+                printToTerminal("Session closed. Returning to terminal...");
             }
-
-            printToTerminal(`% ${rawCmd}`);
-
-            switch(cmd) {
-                case 'about me':
-                    printToTerminal("Welcome to my website! I just learned about the indie web and I think that it is really cool. My name is Donovan and I hope you like looking around!");
-                    break;
-                case 'formula 1':
-                    printToTerminal("The 2026 season is going to start pretty soon and I am really excited. I support McLaren as my number 1 team but also root for Williams. I don’t particularly root for drivers as I prefer to root for teams. I do wish Charles Leclerc the best though as I think he is incredibly talented and deserves the chance to win a championship with Ferrari.");
-                    break;
-                case 'coding':
-                    printToTerminal("I actually didn’t really make this website as I had Gemini do it for me (I know, lame) but I am enjoying learning coding as a whole. I am learning Python and hoping it to integrate that into my IT job. I don’t know html or js and didn’t really want to learn as I don’t intend on using those professionally. If you are interested in looking at my Python work so far, here is the url to my GitHub - https://github.com/z5qtk6kc29-create/Swordfish.git"); 
-                    break;
-                case 'faith':
-                    printToTerminal("I am a firm believer in Jesus Christ being the Son of God and that He lived a perfect life and died as a sacrifice to take away my sin. I believe that He also rose from the dead to live again and to bring about the possibility of new life for those who are willing to accept it. I am very excited for the new life that is to come after I pass away. In the meantime I want to live my life in a way that shows thankfulness for God’s forgiveness.");
-                    break;
-                case 'swordfish':
-                    const img = document.createElement('img');
-                    img.src = 'Swordfish2.jpeg';
-                    img.alt = 'Swordfish photo';
-                    img.width = 300;
-                    img.height = 200;
-                    output.appendChild(img);
-                    break;
-                case 'chat':
-                    isChatOpen = true;
-                    output.style.display = 'none'; 
-                    cboxContainer.style.display = 'block'; 
-                    printToTerminal("Connecting to Cbox...");
-                    break;
-                case 'clear':
-                    output.innerHTML = "";
-                    break;
-                default:
-                    printToTerminal("zsh: command not found: " + cmd);
-            }
+            return;
         }
-    </script>
-</body>
-</html>
+
+        // We print the user's command immediately without the slow-type
+        const cmdLine = document.createElement('div');
+        cmdLine.innerHTML = `<span class="prompt">donovan@website ~ %</span> ${rawCmd}`;
+        output.appendChild(cmdLine);
+
+        switch(cmd) {
+            case 'about me':
+                printToTerminal("Welcome to my website! I just learned about the indie web and I think that it is really cool. My name is Donovan and I hope you like looking around!");
+                break;
+            case 'formula 1':
+                printToTerminal("The 2026 season is going to start pretty soon and I am really excited. I support McLaren as my number 1 team but also root for Williams. I don’t particularly root for drivers as I prefer to root for teams. I do wish Charles Leclerc the best though as I think he is incredibly talented and deserves the chance to win a championship with Ferrari.");
+                break;
+            case 'coding':
+                printToTerminal(
+                    "I actually didn’t really make this website as I had Gemini do it for me (I know, lame) but I am enjoying learning coding as a whole. I am learning Python and hoping to integrate that into my IT job. I don’t know html or js and didn’t really want to learn them as I don’t intend on using those professionally. If you are interested in looking at my Python work so far or the source code for this website, here is the url to my GitHub - " +
+                    "<a href='https://github.com/z5qtk6kc29-create/Swordfish.git' target='_blank' rel='noopener noreferrer'>https://github.com/z5qtk6kc29-create/Swordfish.git</a>"
+                );
+                break;
+            case 'spanish':
+                printToTerminal("He estado aprendiendo el castellano (español de España) desde hace un poco más de cinco años. Lo he disfrutado muchísimo la mayoría del tiempo. A veces me siento que es demasiado difícil y nunca lo haré bien. Pasé un mes vivendo en España el verano pasado y de verdad creo que pude conversar bien, pero no facilmente. Aprender un idioma es una cosa difícil en todo caso, aun un idioma similar con muchas palabras similares. Quiero continuar aprendiendo pero es diferente ahora porque ya terminé todas las lecciones de duolingo."); 
+                break;
+            case 'faith':
+                printToTerminal("I am a firm believer in Jesus Christ being the Son of God and that He lived a perfect life and died as a sacrifice to take away my sin. I believe that He also rose from the dead to live again and to bring about the possibility of new life for those who are willing to accept it. I am very excited for the new life that is to come after I pass away. In the meantime I want to live my life in a way that shows thankfulness for God’s forgiveness.");
+                break;
+            case 'links':
+                const linkList = [
+                    "<br>1. <a href='https://marea.neocities.com' target='_blank'>Cute Path that Leads to Different Places</a>",
+                    "<br>2. <a href='https://ann-html.neocities.com' target='_blank'>Windows XP Clone</a>",
+                    "<br>3. <a href='https://salixx.neocities.com' target='_blank'>Gardening and Crafts</a>"
+                ].join('');
+                printToTerminal("Accessing indie directory..." + linkList);
+                break;
+            case 'swordfish':
+                const img = document.createElement('img');
+                img.src = 'Swordfish2.jpeg';
+                img.alt = 'Swordfish photo';
+                img.width = 300;
+                img.style.display = "block"; // Ensure it doesn't break the layout
+                output.appendChild(img);
+                output.scrollTop = output.scrollHeight;
+                break;
+            case 'chat':
+                isChatOpen = true;
+                output.style.display = 'none'; 
+                cboxContainer.style.display = 'block'; 
+                break;
+            case 'clear':
+                output.innerHTML = "";
+                break;
+            default:
+                printToTerminal("zsh: command not found: " + cmd);
+        }
+    }
+</script>
