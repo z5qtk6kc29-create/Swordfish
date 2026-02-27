@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1e1e1e;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .terminal {
+            background-color: #2d2d2d;
+            border: 2px solid #4a4a4a;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .terminal-header {
+            background-color: #3a3a3a;
+            padding: 10px 15px;
+            border-bottom: 1px solid #4a4a4a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .terminal-title {
+            color: #a0a0a0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .btn-close {
+            background-color: #ff5f57;
+        }
+
+        .btn-minimize {
+            background-color: #ffbd2e;
+        }
+
+        .btn-maximize {
+            background-color: #28c940;
+        }
+
+        .terminal-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            color: #00ff00;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .terminal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal-content::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+
+        .terminal-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+
+        .prompt {
+            color: #00ff00;
+        }
+
+        .user-input {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .output {
+            color: #00ff00;
+            margin-top: 8px;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #4a4a4a;
+        }
+
+        .input-line .prompt {
+            margin-right: 8px;
+        }
+
+        input[type="text"] {
+            background-color: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+            flex: 1;
+            caret-color: #00ff00;
+        }
+
+        input[type="text"]::placeholder {
+            color: #555;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background-color: #00ff00;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% {
+                background-color: #00ff00;
+            }
+            50%, 100% {
+                background-color: transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <span class="terminal-title">Terminal</span>
+            <div class="terminal-buttons">
+                <div class="terminal-button btn-close"></div>
+                <div class="terminal-button btn-minimize"></div>
+                <div class="terminal-button btn-maximize"></div>
+            </div>
+        </div>
+
+        <div class="terminal-content" id="terminalContent">
+            <div class="terminal-line prompt">$ Type "option" or "coding" to get started...</div>
+        </div>
+
+        <div class="input-line">
+            <span class="prompt">$</span>
+            <input 
+                type="text" 
+                id="commandInput" 
+                placeholder="Enter command..." 
+                autocomplete="off"
+            >
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        const commandInput = document.getElementById('commandInput');
+        const terminalContent = document.getElementById('terminalContent');
+
+        commandInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const command = commandInput.value.trim();
+
+                // Display the user's input
+                const userLine = document.createElement('div');
+                userLine.className = 'terminal-line';
+                userLine.innerHTML = `<span class="prompt">$</span> <span class="user-input">${escapeHtml(command)}</span>`;
+                terminalContent.appendChild(userLine);
+
+                // Process the command
+                if (command.toLowerCase() === 'option') {
+                    const outputLine = document.createElement('div');
+                    outputLine.className = 'terminal-line output';
+                    outputLine.textContent = 'Welcome to my website!';
+                    terminalContent.appendChild(outputLine);
+                } else if (command.toLowerCase() === 'coding') {
+                    const outputLine = document.createElement('div');
+                    outputLine.className = 'terminal-line output';
+                    outputLine.textContent = 'I am learning coding but for now I am just learning python which doesn\'t really work in these static websites but I am enjoying the field as a whole';
+                    terminalContent.appendChild(outputLine);
+                } else if (command === '') {
+                    // Do nothing for empty input
+                } else {
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'terminal-line output';
+                    errorLine.textContent = `Command not found: ${command}`;
+                    terminalContent.appendChild(errorLine);
+                }
+
+                // Clear the input
+                commandInput.value = '';
+
+                // Auto-scroll to bottom
+                terminalContent.scrollTop = terminalContent.scrollHeight;
+            }
+        });
+
+        // Focus input on page load
+        commandInput.focus();
+
+        // Helper function to escape HTML special characters
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

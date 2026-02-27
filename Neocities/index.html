@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donovan's Terminal</title>
+    <style>
+        :root {
+            --mac-bg: #1e1e1e;
+            --mac-border: #444;
+            --mac-header: #333;
+        }
+
+        body {
+            background-color: #2c2c2c;
+            background-image: radial-gradient(circle, #3d3d3d 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #d1d1d1;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Options Sidebar */
+        #options-window {
+            width: 180px;
+            background: rgba(45, 45, 45, 0.9);
+            border: 1px solid var(--mac-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-left: 155px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        #options-window h3 {
+            margin-top: 0;
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        ul { list-style: none; padding: 0; }
+        li { margin: 12px 0; font-size: 0.9em; color: #ccc; }
+
+        #terminal-container {
+            flex-grow: 1;
+            display: flex;
+            /* This margin-left controls the gap between the sidebar and terminal */
+            margin-left: 10px; 
+            /* This padding-right pulls the terminal away from the right edge */
+            padding-right: 355px; 
+            justify-content: center;
+        }
+
+        #terminal {
+            width: 85%;
+            max-width: 950px;
+            height: 650px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--mac-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+        }
+
+        .title-bar {
+            height: 38px;
+            background: var(--mac-header);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .buttons { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .title {
+            flex-grow: 1;
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+            margin-right: 50px;
+        }
+
+        .terminal-body {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            font-family: "SF Mono", "Monaco", "Menlo", monospace;
+        }
+
+        #output {
+            flex-grow: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        /* Cbox Iframe Styling */
+        #cbox-container {
+            display: none; /* Hidden until 'chat' is typed */
+            width: 100%;
+            height: 100%;
+            margin-bottom: 10px;
+        }
+
+        #cbox-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .input-line {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #222;
+            background: rgba(0,0,0,0.5);
+        }
+
+        #command-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1.1em;
+            outline: none;
+            flex-grow: 1;
+        }
+
+        .prompt { color: #7cb342; font-weight: bold; font-size: 1.1em; }
+        .user-post { color: #81d4fa; margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+    <div id="options-window">
+        <h3>Finder</h3>
+        <ul>
+            <li>about me</li>
+            <li>formula 1</li>
+            <li>coding</li>
+            <li>faith</li>
+            <li>chat/exit</li>
+        </ul>
+    </div>
+
+    <div id="terminal-container">
+        <div id="terminal">
+            <div class="title-bar">
+                <div class="buttons">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="title">donovan — -zsh — 950×650</div>
+            </div>
+            
+            <div class="terminal-body">
+                <div id="cbox-container">
+                    <iframe src="https://www3.cbox.ws/box/?boxid=3552689&boxtag=EQkLcE" id="cbox-iframe" allowtransparency="yes"></iframe>
+                </div>
+                
+                <div id="output">Last login: Tue Feb 24 17:03:05 on ttys001
+Donovan Website (zsh)
+
+See options for commands on the left.</div>
+                
+                <div class="input-line">
+                    <span class="prompt">donovan@website ~ %</span>
+                    <input type="text" id="command-input" autofocus autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('command-input');
+        const output = document.getElementById('output');
+        const cboxContainer = document.getElementById('cbox-container');
+        let isChatOpen = false;
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const val = input.value.trim();
+                handleCommand(val);
+                input.value = '';
+            }
+        });
+
+        function printToTerminal(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function handleCommand(rawCmd) {
+            const cmd = rawCmd.toLowerCase();
+            if (cmd === "") return;
+
+            // If we are in "chat mode", the terminal input still works for the 'exit' command
+            if (isChatOpen) {
+                if (cmd === 'exit') {
+                    isChatOpen = false;
+                    cboxContainer.style.display = 'none';
+                    output.style.display = 'block';
+                    printToTerminal("% exit");
+                    printToTerminal("Session closed. Returning to terminal...");
+                } else {
+                    // Just clear the line or ignore other commands while chatting
+                }
+                return;
+            }
+
+            printToTerminal(`% ${rawCmd}`);
+
+            switch(cmd) {
+                case 'about me':
+                    printToTerminal("Welcome to my website! I just learned about the indie web and I think that it is really cool. My name is Donovan and I hope you like looking around!");
+                    break;
+                case 'formula 1':
+                    printToTerminal("The 2026 season is going to start pretty soon and I am really excited. I support McLaren as my number 1 team but also root for Williams. I don’t particularly root for drivers as I prefer to root for teams. I do wish Charles Leclerc the best though as I think he is incredibly talented and deserves the chance to win a championship with Ferrari.");
+                    break;
+                case 'coding':
+                    printToTerminal("I actually didn’t really make this website as I had Gemini do it for me (I know, lame) but I am enjoying learning coding as a whole. I am learning Python and hoping it to integrate that into my IT job. I don’t know html or js and didn’t really want to learn as I don’t intend on using those professionally. If you are interested in looking at my Python work so far, here is the url to my GitHub - https://github.com/z5qtk6kc29-create/Swordfish.git"); 
+                    break;
+                case 'faith':
+                    printToTerminal("I am a firm believer in Jesus Christ being the Son of God and that He lived a perfect life and died as a sacrifice to take away my sin. I believe that He also rose from the dead to live again and to bring about the possibility of new life for those who are willing to accept it. I am very excited for the new life that is to come after I pass away. In the meantime I want to live my life in a way that shows thankfulness for God’s forgiveness.");
+                    break;
+                case 'chat':
+                    isChatOpen = true;
+                    output.style.display = 'none'; 
+                    cboxContainer.style.display = 'block'; 
+                    printToTerminal("Connecting to Cbox...");
+                    break;
+                case 'clear':
+                    output.innerHTML = "";
+                    break;
+                default:
+                    printToTerminal("zsh: command not found: " + cmd);
+            }
+        }
+    </script>
+</body>
+</html>
