@@ -153,9 +153,12 @@
         <h3>Finder</h3>
         <ul>
             <li>about me</li>
+            <li>swordfish</li>
             <li>formula 1</li>
             <li>coding</li>
+            <li>spanish</li>
             <li>faith</li>
+            <li>other websites</li>
             <li>chat/exit</li>
         </ul>
     </div>
@@ -242,6 +245,14 @@ See options for commands on the left.</div>
                     break;
                 case 'faith':
                     printToTerminal("I am a firm believer in Jesus Christ being the Son of God and that He lived a perfect life and died as a sacrifice to take away my sin. I believe that He also rose from the dead to live again and to bring about the possibility of new life for those who are willing to accept it. I am very excited for the new life that is to come after I pass away. In the meantime I want to live my life in a way that shows thankfulness for God’s forgiveness.");
+                    break;
+                case 'swordfish':
+                    const img = document.createElement('img');
+                    img.src = 'Swordfish2.jpeg';
+                    img.alt = 'Swordfish photo';
+                    img.width = 300;
+                    img.height = 200;
+                    output.appendChild(img);
                     break;
                 case 'chat':
                     isChatOpen = true;
