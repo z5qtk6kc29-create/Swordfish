@@ -1,14 +1,11 @@
-#Swordfish v4.py
+#Wordle v2.py
 
-#This version includes a way of tracking words and exporting them into a json file. It can also check if the word chosen is in the json file and remove items from the json file after three months. Also some bug fixes with multiple attempts with words that are not in the list
+#This version includes a separate space for the word list and also reuses code much more effectively
 
 #imports
 import random
 import sys
-import json
-import os
 from word_list_file import word_options_as_list
-from datetime import datetime, timedelta
 
 #Here is where it will check that the user wants to play
 def play():
@@ -23,43 +20,10 @@ def play():
         print("\nThat is not one of the options, please choose yes or no\n")
         play()
 
-#Here is where it will scan the json and remove anything older than 90 days from the list
-def cleanup_data(most_recent_words):
-    three_months_ago = datetime.now() - timedelta(days=90)
-
-    if os.path.exists('recent_words.json'):
-            with open('recent_words.json', 'r') as file:
-                data = json.load(file)
-            
-            filtered_data = {
-                word: date_str for word, date_str in data.items()
-                if datetime.strptime(date_str, '%Y-%m-%d') > three_months_ago
-            }
-
-            with open('recent_words.json', 'w') as file:
-                json.dump(filtered_data, file, indent=4)
-                
-            return filtered_data
-    return {}
-
 #Here is where the computer chooses its word
 def computer_as_word(word_options_as_list):
     computer_choice = random.choice(word_options_as_list)
     return computer_choice
-
-#Here is where I would like to add the choice and the time of said choice into a separate file
-def keep_track_of_when_used(computer_choice):
-    most_recent_words[computer_choice] = datetime.now().strftime("%Y-%m-%d")
-    with open('recent_words.json', 'w') as file:
-        json.dump(most_recent_words, file, indent=4)
-    return most_recent_words
-
-#Here is where it will load existing data to file, or start with empty dict
-if os.path.exists('recent_words.json'):
-    with open('recent_words.json', 'r') as file:
-        most_recent_words = json.load(file)
-else:
-    most_recent_words = {}
 
 #Here is where the word gets split into a list
 def computer(computer_choice):
@@ -71,7 +35,7 @@ def user(word_options_as_list):
     user_choice = input("\nTry a word: ").lower()
     if user_choice not in word_options_as_list:
         print("That is not a valid word")
-        user_list = user(word_options_as_list)
+        user()
     else:
         user_list = list(user_choice)
     return user_list
@@ -98,11 +62,7 @@ def repeat_two_to_six(word_options_as_list, computer_list, computer_choice):
 
 #Here is where I call the functions to actually happen
 play()
-cleanup_data(most_recent_words)
 computer_choice = computer_as_word(word_options_as_list)
-if computer_choice in most_recent_words:
-    computer_choice = computer_as_word(word_options_as_list)
-most_recent_words = keep_track_of_when_used(computer_choice)
 computer_list = computer(computer_choice)
 user_list = user(word_options_as_list)
 check_win(computer_list, user_list)

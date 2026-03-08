@@ -1,6 +1,6 @@
-#Swordfish v6.py
+#Wordle v6.py
 
-#This version includes changes to the font color instead of spelling out the letters place
+#This version includes fixes to the double letter issue
 
 #imports
 import random
@@ -21,7 +21,7 @@ def play():
         print("\nAlright, maybe later\n")
         play()
     elif first_response in ["yes", "yeah", "y"]:
-        print("\nThe rules are:\n-You have to choose a five letter word\n-You want to guess the same word that the computer chose\n-You have to use real English words\n-Green indicates that it is the right letter\n-Yellow indicates that is in the word, but the wrong location\n-White indicates that it is not in the word\n\nAlright, let's play!")
+        print("\nThe rules are:\n-You have to choose a five letter word\n-You want to guess the same word that the computer chose\n-You have to use real English words\n-Purple indicates that it is the right letter\n-Blue indicates that is in the word, but the wrong location\n-White indicates that it is not in the word\n\nAlright, let's play!")
     else:
         print("\nThat is not one of the options, please choose yes or no\n")
         play()
@@ -101,14 +101,28 @@ def check_win(computer_list, user_list, user_choice):
     if user_list == computer_list:
         sys.exit(Fore.GREEN + user_choice + Style.RESET_ALL + "\nYou have found the wordle!")
     else:
-        for l in range(len(user_list)):
-            if user_list[l] == computer_list[l]:
-                print(Fore.GREEN + user_list[l] + Style.RESET_ALL, end="")
-            elif user_list[l] in computer_list:
-                print(Fore.YELLOW + user_list[l] + Style.RESET_ALL, end="")
-            else:
-                print(user_list[l], end="")
+        letter_counts = {}
+        for letter in computer_list:
+            letter_counts[letter] = letter_counts.get(letter, 0) + 1
+        
+        result = [''] * len(user_list)
+        for i in range(len(user_list)):
+            if user_list[i] == computer_list[i]:
+                result[i] = Fore.GREEN + user_list[i] + Style.RESET_ALL
+                letter_counts[user_list[i]] -= 1
+        
+        for i in range(len(user_list)):
+            if result[i] == '': 
+                if user_list[i] in letter_counts and letter_counts[user_list[i]] > 0:
+                    result[i] = Fore.YELLOW + user_list[i] + Style.RESET_ALL
+                    letter_counts[user_list[i]] -= 1
+                else:
+                    result[i] = user_list[i]
+        
+        print(''.join(result))
+    
     available(user_list)
+
 
 #Here is where they can try again
 def repeat_two_to_six(word_options_as_list, computer_list, computer_choice):
