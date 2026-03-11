@@ -21,7 +21,7 @@ def play():
         print("\nAlright, maybe later\n")
         play()
     elif first_response in ["yes", "yeah", "y"]:
-        print("\nThe rules are:\n-You have to choose a five letter word\n-You want to guess the same word that the computer chose\n-You have to use real English words\n-Purple indicates that it is the right letter\n-Blue indicates that is in the word, but the wrong location\n-White indicates that it is not in the word\n\nAlright, let's play!")
+        print("\nThe rules are:\n-You have to choose a five letter word\n-You want to guess the same word that the computer chose\n-You have to use real English words\n-Green indicates that it is the right letter\n-Yellow indicates that is in the word, but the wrong location\n-White indicates that it is not in the word\n\nAlright, let's play!")
     else:
         print("\nThat is not one of the options, please choose yes or no\n")
         play()
