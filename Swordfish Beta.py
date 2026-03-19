@@ -16,6 +16,8 @@
 
 import pygame
 import sys
+import random
+import math
 
 pygame.init()
 
@@ -36,6 +38,14 @@ original_image2 = pygame.image.load('computer_shark.png')
 original_image2 = pygame.transform.scale(original_image2, (125, 125))
 computer_image = original_image2.copy()
 computer_rect = computer_image.get_rect()
+computer_rect.center = (SCREEN_HEIGHT - 10, SCREEN_WIDTH - 10)
+
+angle = random.uniform(0, 2 * math.pi)
+speed = random.uniform(2, 6)
+velocity_y = math.cos(angle) * speed
+velocity_x = math.cos(angle) * speed
+change_direction_timer = 0
+change_direction_interval = 60
 
 player_speed = 4
 
@@ -72,8 +82,20 @@ while running:
     if keys[pygame.K_LEFT] and keys[pygame.K_UP]:
         player_image = pygame.transform.rotate(original_image, 315)
 
+    change_direction_timer +=1
+    if change_direction_timer >= change_direction_interval:
+        velocity_x = random.uniform(-2, 2)
+        velocity_y = random.uniform(-2, 2)
+        change_direction_timer = 0
+
+    computer_rect.x += velocity_x
+    computer_rect.y += velocity_y
+    computer_rect.x = max(0, min(computer_rect.x, SCREEN_WIDTH - 20))
+    computer_rect.y = max(0, min(computer_rect.y, SCREEN_HEIGHT - 20))
+
+
     player_rect.x = max(0, min(player_rect.x, SCREEN_WIDTH - player_rect.width))
-    player_rect.y = max(0, min(player_rect.y, SCREEN_WIDTH - player_rect.height))
+    player_rect.y = max(0, min(player_rect.y, SCREEN_HEIGHT - player_rect.height))
 
     screen.fill((80, 140, 160))
     screen.blit(player_image, player_rect)
