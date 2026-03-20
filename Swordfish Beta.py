@@ -12,12 +12,12 @@
 #Make a counter that keeps track of how many sharks you killed
 #Make orange, yellow, and red fish that follow shark principles that you do not want to kill (the fish cannot kill swordfish though)
 #-3 points for killing a fish
+#Make a bomb button that kills everything, could help your score, could hurt
 #End the game/maybe restart when a shark kills you
 
 import pygame
 import sys
 import random
-import math
 
 pygame.init()
 
@@ -34,20 +34,21 @@ player_image = original_image.copy()
 player_rect = player_image.get_rect()
 player_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
+numberx = [50, 700]
+numbery = [50, 700]
+
 original_image2 = pygame.image.load('computer_shark.png')
 original_image2 = pygame.transform.scale(original_image2, (125, 125))
 computer_image = original_image2.copy()
 computer_rect = computer_image.get_rect()
-computer_rect.center = (SCREEN_HEIGHT - 10, SCREEN_WIDTH - 10)
+computer_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
 
-angle = random.uniform(0, 2 * math.pi)
-speed = random.uniform(2, 6)
-velocity_y = math.cos(angle) * speed
-velocity_x = math.cos(angle) * speed
+velocity_x = 0
+velocity_y = 0
 change_direction_timer = 0
 change_direction_interval = 60
 
-player_speed = 4
+player_speed = 5
 
 running = True
 while running:
@@ -84,15 +85,38 @@ while running:
 
     change_direction_timer +=1
     if change_direction_timer >= change_direction_interval:
-        velocity_x = random.uniform(-2, 2)
-        velocity_y = random.uniform(-2, 2)
+        velocity_x = random.uniform(-4, 4)
+        velocity_y = random.uniform(-4, 4)
         change_direction_timer = 0
 
     computer_rect.x += velocity_x
     computer_rect.y += velocity_y
-    computer_rect.x = max(0, min(computer_rect.x, SCREEN_WIDTH - 20))
-    computer_rect.y = max(0, min(computer_rect.y, SCREEN_HEIGHT - 20))
 
+    if computer_rect.left < -50 or computer_rect.right > SCREEN_WIDTH:
+        velocity_x *= -1
+    if computer_rect.top < -50 or computer_rect.bottom > SCREEN_WIDTH:
+        velocity_y *= -1
+
+    if velocity_y > 0 and velocity_x == 0:
+        computer_image = pygame.transform.rotate(original_image2, 90)
+    if velocity_y == 0 and velocity_x > 0:
+        computer_image = pygame.transform.rotate(original_image2, 180)
+    if velocity_y == 0 and velocity_x < 0:
+        computer_image = pygame.transform.rotate(original_image2, 0)
+    if velocity_y < 0 and velocity_x == 0:
+        computer_image = pygame.transform.rotate(original_image2, 270)
+
+    if velocity_y > 0 and velocity_x > 0:
+        computer_image = pygame.transform.rotate(original_image2, 135)
+    if velocity_y < 0 and velocity_x < 0:
+        computer_image = pygame.transform.rotate(original_image2, 315)
+    if velocity_y > 0 and velocity_x < 0:
+        computer_image = pygame.transform.rotate(original_image2, 45)
+    if velocity_y < 0 and velocity_x > 0:
+        computer_image = pygame.transform.rotate(original_image2, 225)
+
+    if velocity_y == 0 and velocity_x == 0:
+        computer_image = pygame.transform.rotate(original_image2, 0)
 
     player_rect.x = max(0, min(player_rect.x, SCREEN_WIDTH - player_rect.width))
     player_rect.y = max(0, min(player_rect.y, SCREEN_HEIGHT - player_rect.height))
@@ -100,6 +124,7 @@ while running:
     screen.fill((80, 140, 160))
     screen.blit(player_image, player_rect)
     screen.blit(computer_image, computer_rect)
+
     pygame.display.flip()
 
 pygame.quit()
