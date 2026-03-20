@@ -93,9 +93,9 @@ while running:
     computer_rect.y += velocity_y
 
     if computer_rect.left < -50 or computer_rect.right > SCREEN_WIDTH:
-        velocity_x *= -1
+        velocity_x *= -1.5
     if computer_rect.top < -50 or computer_rect.bottom > SCREEN_WIDTH:
-        velocity_y *= -1
+        velocity_y *= -1.5
 
     if velocity_y > 0 and velocity_x == 0:
         computer_image = pygame.transform.rotate(original_image2, 90)
