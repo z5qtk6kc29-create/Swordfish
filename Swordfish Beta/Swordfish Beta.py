@@ -37,24 +37,64 @@ background_image = pygame.image.load('background.png')
 background_image = pygame.transform.scale(background_image, (750, 750))
 
 #Swordfish
-original_image = pygame.image.load('player_swordfish.png')
+original_image = pygame.image.load('swordfish.png')
 original_image = pygame.transform.scale(original_image, (100, 100))
-player_image = original_image.copy()
-player_rect = player_image.get_rect()
-player_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-player_speed = 5
+swordfish_image = original_image.copy()
+swordfish_rect = swordfish_image.get_rect()
+swordfish_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+swordfish_speed = 5
+
+swordfish_hitbox_rect = swordfish_rect.inflate(-60, -60) 
+swordfish_hitbox_rect.center = swordfish_rect.center
+
+swordfish_alive = True
+
+d1_straight = 25
+d1_diag = 15
+
+offsets1 = {
+    0:   (d1_straight, 0),    # Right
+    45:  (d1_diag, -d1_diag),  # Up-Right
+    90:  (0, -d1_straight),   # Up
+    135: (-d1_diag, -d1_diag), # Up-Left
+    180: (-d1_straight, 0),   # Left
+    225: (-d1_diag, d1_diag),  # Down-Left
+    270: (0, d1_straight),    # Down
+    315: (d1_diag, d1_diag)    # Down-Right
+}
+
+#Sword
+sword_rect = pygame.Rect(0, 0, 30, 30)
+d2_straight = -35
+d2_diag = -25
+
+offsets2 = {
+    0:   (d2_straight, 0),    # Right
+    45:  (d2_diag, -d2_diag),  # Up-Right
+    90:  (0, -d2_straight),   # Up
+    135: (-d2_diag, -d2_diag), # Up-Left
+    180: (-d2_straight, 0),   # Left
+    225: (-d2_diag, d2_diag),  # Down-Left
+    270: (0, d2_straight),    # Down
+    315: (d2_diag, d2_diag)    # Down-Right
+}
+current_angle = 0
 
 #Shark
-original_image2 = pygame.image.load('computer_shark.png')
+original_image2 = pygame.image.load('shark.png')
 original_image2 = pygame.transform.scale(original_image2, (125, 125))
-computer_image = original_image2.copy()
-computer_rect = computer_image.get_rect()
-computer_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
+shark_image = original_image2.copy()
+shark_rect = shark_image.get_rect()
+shark_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
+
+shark_alive = True
 
 velocity_x_shark = 0
 velocity_y_shark = 0
 change_direction_timer_shark = 0
 change_direction_interval_shark = 60
+
+shark_hitbox_rect = shark_rect.inflate(-50, -50)
 
 #Green Fish
 original_image3 = pygame.image.load('green_fish.png')
@@ -68,6 +108,10 @@ velocity_y_green = 0
 change_direction_timer_green = 0
 change_direction_interval_green = 60
 
+green_fish_hitbox_rect = green_fish_rect.inflate(-20, -20)
+
+green_fish_alive = True
+
 #Yellow Fish
 original_image4 = pygame.image.load('yellow_fish.png')
 original_image4 = pygame.transform.scale(original_image4, (75, 75))
@@ -79,6 +123,10 @@ velocity_x_yellow = 0
 velocity_y_yellow = 0
 change_direction_timer_yellow = 0
 change_direction_interval_yellow = 60
+
+yellow_fish_hitbox_rect = yellow_fish_rect.inflate(-20, -20)
+
+yellow_fish_alive = True
 
 #Red Fish
 original_image5 = pygame.image.load('red_fish.png')
@@ -92,6 +140,10 @@ velocity_y_red = 0
 change_direction_timer_red = 0
 change_direction_interval_red = 60
 
+red_fish_hitbox_rect = red_fish_rect.inflate(-20, -20)
+
+red_fish_alive = True
+
 #Orange Fish
 original_image6 = pygame.image.load('orange_fish.png')
 original_image6 = pygame.transform.scale(original_image6, (75, 75))
@@ -104,40 +156,62 @@ velocity_y_orange = 0
 change_direction_timer_orange = 0
 change_direction_interval_orange = 60
 
+orange_fish_hitbox_rect = orange_fish_rect.inflate(-20, -20)
+
+orange_fish_alive = True
+
 running = True
 while running:
     #Just make the game run and stop
     clock.tick(FPS)
+    current_time = pygame.time.get_ticks()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         
-    #Player movement
+    #Swordfish movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP]:
-        player_rect.y -= player_speed
-        player_image = pygame.transform.rotate(original_image, 270)
+        swordfish_rect.y -= swordfish_speed
+        swordfish_image = pygame.transform.rotate(original_image, 270)
+        current_angle = 270
     if keys[pygame.K_DOWN]:
-        player_rect.y += player_speed
-        player_image = pygame.transform.rotate(original_image, 90)
+        swordfish_rect.y += swordfish_speed
+        swordfish_image = pygame.transform.rotate(original_image, 90)
+        current_angle = 90
     if keys[pygame.K_LEFT]:
-        player_rect.x -= player_speed
-        player_image = pygame.transform.rotate(original_image, 0)
+        swordfish_rect.x -= swordfish_speed
+        swordfish_image = pygame.transform.rotate(original_image, 0)
+        current_angle = 0
     if keys[pygame.K_RIGHT]:
-        player_rect.x += player_speed
-        player_image = pygame.transform.rotate(original_image, 180)
+        swordfish_rect.x += swordfish_speed
+        swordfish_image = pygame.transform.rotate(original_image, 180)
+        current_angle = 180
     if keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
-        player_image = pygame.transform.rotate(original_image, 225)
+        swordfish_image = pygame.transform.rotate(original_image, 225)
+        current_angle = 225
     if keys[pygame.K_RIGHT] and keys[pygame.K_DOWN]:
-        player_image = pygame.transform.rotate(original_image, 135)
+        swordfish_image = pygame.transform.rotate(original_image, 135)
+        current_angle = 135
     if keys[pygame.K_DOWN] and keys[pygame.K_LEFT]:
-        player_image = pygame.transform.rotate(original_image, 45)
+        swordfish_image = pygame.transform.rotate(original_image, 45)
+        current_angle = 45
     if keys[pygame.K_LEFT] and keys[pygame.K_UP]:
-        player_image = pygame.transform.rotate(original_image, 315)
+        swordfish_image = pygame.transform.rotate(original_image, 315)
+        current_angle = 315
 
-    player_rect.x = max(0, min(player_rect.x, SCREEN_WIDTH - player_rect.width))
-    player_rect.y = max(0, min(player_rect.y, SCREEN_HEIGHT - player_rect.height))
+    swordfish_rect.x = max(0, min(swordfish_rect.x, SCREEN_WIDTH - swordfish_rect.width))
+    swordfish_rect.y = max(0, min(swordfish_rect.y, SCREEN_HEIGHT - swordfish_rect.height))
+ 
+    #Hitbox movement with the swordfish
+    off1_x, off1_y = offsets1[current_angle]
+    off2_x, off2_y = offsets2[current_angle]
+
+    swordfish_hitbox_rect.centerx = swordfish_rect.centerx + off1_x
+    swordfish_hitbox_rect.centery = swordfish_rect.centery + off1_y
+    sword_rect.centerx = swordfish_rect.centerx + off2_x
+    sword_rect.centery = swordfish_rect.centery + off2_y
 
     #Shark movement
     change_direction_timer_shark +=1
@@ -146,32 +220,32 @@ while running:
         velocity_y_shark = random.uniform(-4, 4)
         change_direction_timer_shark = 0
 
-    computer_rect.x += velocity_x_shark
-    computer_rect.y += velocity_y_shark
+    shark_rect.x += velocity_x_shark
+    shark_rect.y += velocity_y_shark
 
-    if computer_rect.left < -50 or computer_rect.right > SCREEN_WIDTH:
+    if shark_rect.left < -50 or shark_rect.right > SCREEN_WIDTH:
         velocity_x_shark *= -1.5
-    if computer_rect.top < -50 or computer_rect.bottom > SCREEN_WIDTH:
+    if shark_rect.top < -50 or shark_rect.bottom > SCREEN_WIDTH:
         velocity_y_shark *= -1.5
 
     if velocity_y_shark > 0 and velocity_x_shark == 0:
-        computer_image = pygame.transform.rotate(original_image2, 90)
+        shark_image = pygame.transform.rotate(original_image2, 90)
     if velocity_y_shark == 0 and velocity_x_shark > 0:
-        computer_image = pygame.transform.rotate(original_image2, 180)
+        shark_image = pygame.transform.rotate(original_image2, 180)
     if velocity_y_shark == 0 and velocity_x_shark < 0:
-        computer_image = pygame.transform.rotate(original_image2, 0)
+        shark_image = pygame.transform.rotate(original_image2, 0)
     if velocity_y_shark < 0 and velocity_x_shark == 0:
-        computer_image = pygame.transform.rotate(original_image2, 270)
+        shark_image = pygame.transform.rotate(original_image2, 270)
     if velocity_y_shark > 0 and velocity_x_shark > 0:
-        computer_image = pygame.transform.rotate(original_image2, 135)
+        shark_image = pygame.transform.rotate(original_image2, 135)
     if velocity_y_shark < 0 and velocity_x_shark < 0:
-        computer_image = pygame.transform.rotate(original_image2, 315)
+        shark_image = pygame.transform.rotate(original_image2, 315)
     if velocity_y_shark > 0 and velocity_x_shark < 0:
-        computer_image = pygame.transform.rotate(original_image2, 45)
+        shark_image = pygame.transform.rotate(original_image2, 45)
     if velocity_y_shark < 0 and velocity_x_shark > 0:
-        computer_image = pygame.transform.rotate(original_image2, 225)
+        shark_image = pygame.transform.rotate(original_image2, 225)
     if velocity_y_shark == 0 and velocity_x_shark == 0:
-        computer_image = pygame.transform.rotate(original_image2, 0)
+        shark_image = pygame.transform.rotate(original_image2, 0)
 
     #Green fish specific movement
     change_direction_timer_green +=1
@@ -309,14 +383,62 @@ while running:
     if velocity_y_orange == 0 and velocity_x_orange == 0:
         orange_fish_image = pygame.transform.rotate(original_image6, 0)
 
+    #Update all rects
+    swordfish_rect.topleft = (swordfish_rect.x, swordfish_rect.y)
+    shark_rect.topleft = (shark_rect.x, shark_rect.y)
+    green_fish_rect.topleft = (green_fish_rect.x, green_fish_rect.y)
+    yellow_fish_rect.topleft = (yellow_fish_rect.x, yellow_fish_rect.y)
+    red_fish_rect.topleft = (red_fish_rect.x, red_fish_rect.y)
+    orange_fish_rect.topleft = (orange_fish_rect.x, orange_fish_rect.y)
+
+    shark_hitbox_rect.bottomright = shark_rect.bottomright
+    green_fish_hitbox_rect.bottomright = green_fish_rect.bottomright
+    yellow_fish_hitbox_rect.bottomright = yellow_fish_rect.bottomright
+    red_fish_hitbox_rect.bottomright = red_fish_rect.bottomright
+    orange_fish_hitbox_rect.bottomright = orange_fish_rect.bottomright
+
+    if shark_alive == False and current_time - respawn_time > 3000:
+            shark_alive = True
+    
+    #Collisions
+    if shark_alive == True and sword_rect.colliderect(shark_hitbox_rect):
+            shark_alive = False
+            respawn_time = current_time
+    if swordfish_hitbox_rect.colliderect(shark_hitbox_rect) and shark_alive == True:
+        pygame.quit()
+    if sword_rect.colliderect(green_fish_hitbox_rect):
+        green_fish_alive = False
+    if sword_rect.colliderect(yellow_fish_hitbox_rect):
+        yellow_fish_alive = False
+    if sword_rect.colliderect(red_fish_hitbox_rect):
+        red_fish_alive = False
+    if sword_rect.colliderect(orange_fish_hitbox_rect):
+        orange_fish_alive = False
+
+    #Fish importance
+    fish_status = [green_fish_alive, yellow_fish_alive, red_fish_alive, orange_fish_alive]
+    if not any(fish_status):
+        pygame.quit()
+
     #Actually render the game
     screen.blit(background_image, (0, 0))
-    screen.blit(player_image, player_rect)
-    screen.blit(computer_image, computer_rect)
-    screen.blit(green_fish_image, green_fish_rect)
-    screen.blit(yellow_fish_image, yellow_fish_rect)
-    screen.blit(red_fish_image, red_fish_rect)
-    screen.blit(orange_fish_image, orange_fish_rect)
+    if swordfish_alive == True:
+        screen.blit(swordfish_image, swordfish_rect)
+    if shark_alive == True:
+        screen.blit(shark_image, shark_rect)
+    if green_fish_alive == True:
+        screen.blit(green_fish_image, green_fish_rect)
+    if yellow_fish_alive == True:
+        screen.blit(yellow_fish_image, yellow_fish_rect)
+    if red_fish_alive == True:
+        screen.blit(red_fish_image, red_fish_rect)
+    if orange_fish_alive == True:
+        screen.blit(orange_fish_image, orange_fish_rect)
+
+    #pygame.draw.rect(screen, (255, 255, 0), swordfish_hitbox_rect, 2)
+    #pygame.draw.rect(screen, (255, 0, 0), sword_rect, 2)
+    #pygame.draw.rect(screen, (255, 255, 0), green_fish_hitbox_rect, 2)
+    #pygame.draw.rect(screen, (255, 0, 0), shark_hitbox_rect, 2)
 
     pygame.display.flip()
 
