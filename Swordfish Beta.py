@@ -32,6 +32,10 @@ FPS = 60
 numberx = [50, 700]
 numbery = [50, 700]
 
+#Background
+background_image = pygame.image.load('background.png')
+background_image = pygame.transform.scale(background_image, (750, 750))
+
 #Swordfish
 original_image = pygame.image.load('player_swordfish.png')
 original_image = pygame.transform.scale(original_image, (100, 100))
@@ -306,7 +310,7 @@ while running:
         orange_fish_image = pygame.transform.rotate(original_image6, 0)
 
     #Actually render the game
-    screen.fill((80, 140, 160))
+    screen.blit(background_image, (0, 0))
     screen.blit(player_image, player_rect)
     screen.blit(computer_image, computer_rect)
     screen.blit(green_fish_image, green_fish_rect)
