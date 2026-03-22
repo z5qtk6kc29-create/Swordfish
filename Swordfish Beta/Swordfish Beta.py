@@ -397,23 +397,36 @@ while running:
     red_fish_hitbox_rect.bottomright = red_fish_rect.bottomright
     orange_fish_hitbox_rect.bottomright = orange_fish_rect.bottomright
 
-    if shark_alive == False and current_time - respawn_time > 3000:
+    #Revive
+    if shark_alive == False and current_time - respawn_time_shark > 3000:
             shark_alive = True
+    if green_fish_alive == False and current_time - respawn_time_green > 20000:
+            green_fish_alive = True
+    if yellow_fish_alive == False and current_time - respawn_time_yellow > 20000:
+            yellow_fish_alive = True
+    if red_fish_alive == False and current_time - respawn_time_red > 20000:
+            red_fish_alive = True
+    if orange_fish_alive == False and current_time - respawn_time_orange > 20000:
+            orange_fish_alive = True
     
     #Collisions
     if shark_alive == True and sword_rect.colliderect(shark_hitbox_rect):
             shark_alive = False
-            respawn_time = current_time
+            respawn_time_shark = current_time
     if swordfish_hitbox_rect.colliderect(shark_hitbox_rect) and shark_alive == True:
         pygame.quit()
     if sword_rect.colliderect(green_fish_hitbox_rect):
         green_fish_alive = False
+        respawn_time_green = current_time
     if sword_rect.colliderect(yellow_fish_hitbox_rect):
         yellow_fish_alive = False
+        respawn_time_yellow = current_time
     if sword_rect.colliderect(red_fish_hitbox_rect):
         red_fish_alive = False
+        respawn_time_red = current_time
     if sword_rect.colliderect(orange_fish_hitbox_rect):
         orange_fish_alive = False
+        respawn_time_orange = current_time
 
     #Fish importance
     fish_status = [green_fish_alive, yellow_fish_alive, red_fish_alive, orange_fish_alive]
