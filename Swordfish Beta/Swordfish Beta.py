@@ -21,6 +21,10 @@ import sys
 import random
 
 pygame.init()
+pygame.font.init()
+
+score = 0
+font = pygame.font.Font(None, 35)
 
 SCREEN_WIDTH = 750
 SCREEN_HEIGHT = 750
@@ -48,6 +52,7 @@ swordfish_hitbox_rect = swordfish_rect.inflate(-60, -60)
 swordfish_hitbox_rect.center = swordfish_rect.center
 
 swordfish_alive = True
+let_you_see_the_score = 100000000
 
 d1_straight = 25
 d1_diag = 15
@@ -214,12 +219,27 @@ while running:
     sword_rect.centery = swordfish_rect.centery + off2_y
 
     #Shark movement
+    max_speed = 2
+
+    if score >= 30:
+        max_speed = 8
+    if score >= 25:
+        max_speed = 7
+    if score >= 20:
+        max_speed = 6
+    if score >= 15:
+        max_speed = 5
+    if score >= 10:
+        max_speed = 4
+    if score >= 5:
+        max_speed = 3
+
     change_direction_timer_shark +=1
     if change_direction_timer_shark >= change_direction_interval_shark:
-        velocity_x_shark = random.uniform(-4, 4)
-        velocity_y_shark = random.uniform(-4, 4)
+        velocity_x_shark = random.uniform(-max_speed, max_speed)
+        velocity_y_shark = random.uniform(-max_speed, max_speed)
         change_direction_timer_shark = 0
-
+    
     shark_rect.x += velocity_x_shark
     shark_rect.y += velocity_y_shark
 
@@ -399,34 +419,42 @@ while running:
 
     #Revive
     if shark_alive == False and current_time - respawn_time_shark > 3000:
-            shark_alive = True
+        shark_alive = True
     if green_fish_alive == False and current_time - respawn_time_green > 20000:
-            green_fish_alive = True
+        green_fish_alive = True
     if yellow_fish_alive == False and current_time - respawn_time_yellow > 20000:
-            yellow_fish_alive = True
+        yellow_fish_alive = True
     if red_fish_alive == False and current_time - respawn_time_red > 20000:
-            red_fish_alive = True
+        red_fish_alive = True
     if orange_fish_alive == False and current_time - respawn_time_orange > 20000:
-            orange_fish_alive = True
+        orange_fish_alive = True
     
     #Collisions
-    if shark_alive == True and sword_rect.colliderect(shark_hitbox_rect):
-            shark_alive = False
-            respawn_time_shark = current_time
+    if shark_alive == True and swordfish_alive == True and sword_rect.colliderect(shark_hitbox_rect):
+        shark_alive = False
+        respawn_time_shark = current_time
+        score += 1
     if swordfish_hitbox_rect.colliderect(shark_hitbox_rect) and shark_alive == True:
+        swordfish_alive = False
+        let_you_see_the_score = current_time
+    if current_time - let_you_see_the_score > 3000:
         pygame.quit()
-    if sword_rect.colliderect(green_fish_hitbox_rect):
+    if green_fish_alive == True and swordfish_alive == True and sword_rect.colliderect(green_fish_hitbox_rect):
         green_fish_alive = False
         respawn_time_green = current_time
-    if sword_rect.colliderect(yellow_fish_hitbox_rect):
+        score -= 1
+    if yellow_fish_alive == True and swordfish_alive == True and sword_rect.colliderect(yellow_fish_hitbox_rect):
         yellow_fish_alive = False
         respawn_time_yellow = current_time
-    if sword_rect.colliderect(red_fish_hitbox_rect):
+        score -= 2
+    if red_fish_alive == True and swordfish_alive == True and sword_rect.colliderect(red_fish_hitbox_rect):
         red_fish_alive = False
         respawn_time_red = current_time
-    if sword_rect.colliderect(orange_fish_hitbox_rect):
+        score -= 3
+    if orange_fish_alive == True and swordfish_alive == True and sword_rect.colliderect(orange_fish_hitbox_rect):
         orange_fish_alive = False
         respawn_time_orange = current_time
+        score -= 4
 
     #Fish importance
     fish_status = [green_fish_alive, yellow_fish_alive, red_fish_alive, orange_fish_alive]
@@ -447,6 +475,9 @@ while running:
         screen.blit(red_fish_image, red_fish_rect)
     if orange_fish_alive == True:
         screen.blit(orange_fish_image, orange_fish_rect)
+
+    score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+    screen.blit(score_text, (10, 10))
 
     #pygame.draw.rect(screen, (255, 255, 0), swordfish_hitbox_rect, 2)
     #pygame.draw.rect(screen, (255, 0, 0), sword_rect, 2)
