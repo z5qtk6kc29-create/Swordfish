@@ -219,25 +219,12 @@ while running:
     sword_rect.centery = swordfish_rect.centery + off2_y
 
     #Shark movement
-    max_speed = 2
-
-    if score >= 30:
-        max_speed = 8
-    if score >= 25:
-        max_speed = 7
-    if score >= 20:
-        max_speed = 6
-    if score >= 15:
-        max_speed = 5
-    if score >= 10:
-        max_speed = 4
-    if score >= 5:
-        max_speed = 3
+    shark_speed = 2 + (score // 5)
 
     change_direction_timer_shark +=1
     if change_direction_timer_shark >= change_direction_interval_shark:
-        velocity_x_shark = random.uniform(-max_speed, max_speed)
-        velocity_y_shark = random.uniform(-max_speed, max_speed)
+        velocity_x_shark = random.uniform(-shark_speed, shark_speed + 1)
+        velocity_y_shark = random.uniform(-shark_speed, shark_speed + 1)
         change_direction_timer_shark = 0
     
     shark_rect.x += velocity_x_shark
@@ -268,10 +255,12 @@ while running:
         shark_image = pygame.transform.rotate(original_image2, 0)
 
     #Green fish specific movement
+    fish_speed = 2 + (score // 10)
+
     change_direction_timer_green +=1
     if change_direction_timer_green >= change_direction_interval_green:
-        velocity_x_green = random.uniform(-2, 2)
-        velocity_y_green = random.uniform(-2, 2)
+        velocity_x_green = random.uniform(-fish_speed, fish_speed + 1)
+        velocity_y_green = random.uniform(-fish_speed, fish_speed + 1)
         change_direction_timer_green = 0
 
     green_fish_rect.x += velocity_x_green
@@ -304,8 +293,8 @@ while running:
     #Yellow fish specific movement
     change_direction_timer_yellow +=1
     if change_direction_timer_yellow >= change_direction_interval_yellow:
-        velocity_x_yellow = random.uniform(-2, 2)
-        velocity_y_yellow = random.uniform(-2, 2)
+        velocity_x_yellow = random.uniform(-fish_speed, fish_speed + 1)
+        velocity_y_yellow = random.uniform(-fish_speed, fish_speed + 1)
         change_direction_timer_yellow = 0
 
     yellow_fish_rect.x += velocity_x_yellow
@@ -338,8 +327,8 @@ while running:
     #Red fish specific movement
     change_direction_timer_red +=1
     if change_direction_timer_red >= change_direction_interval_red:
-        velocity_x_red = random.uniform(-2, 2)
-        velocity_y_red = random.uniform(-2, 2)
+        velocity_x_red = random.uniform(-fish_speed, fish_speed + 1)
+        velocity_y_red = random.uniform(-fish_speed, fish_speed + 1)
         change_direction_timer_red = 0
 
     red_fish_rect.x += velocity_x_red
@@ -372,8 +361,8 @@ while running:
     #Orange fish specific movement
     change_direction_timer_orange +=1
     if change_direction_timer_orange >= change_direction_interval_orange:
-        velocity_x_orange = random.uniform(-2, 2)
-        velocity_y_orange = random.uniform(-2, 2)
+        velocity_x_orange = random.uniform(-fish_speed, fish_speed + 1)
+        velocity_y_orange = random.uniform(-fish_speed, fish_speed + 1)
         change_direction_timer_orange = 0
 
     orange_fish_rect.x += velocity_x_orange
