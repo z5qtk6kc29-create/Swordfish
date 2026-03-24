@@ -219,19 +219,19 @@ while running:
     sword_rect.centery = swordfish_rect.centery + off2_y
 
     #Shark movement
-    shark_speed = [-3, -2, 2, 3]
+    shark_speed = [-2, -1, 0, 1, 2]
     if score >= 30:
-        shark_speed = [-8, -7, -6, -5, 5, 6, 7, 8]
+        shark_speed = [-7, -6, -5, -4, 0, 4, 5, 6, 7]
     if score >= 25:
-        shark_speed = [-7, -6, -5, -4, -3, 3, 4, 5, 6, 7]
+        shark_speed = [-6, -5, -4, -3, 0, 3, 4, 5, 6]
     if score >= 20:
-        shark_speed = [-6, -5, -4, -3, 3, 4, 5, 6]
+        shark_speed = [-5, -4, -3, 0, 3, 4, 5]
     if score >= 15:
-        shark_speed = [-5, -4, -3, 3, 4, 5]
+        shark_speed = [-5, -4, -3, -2, 0, 2, 3, 4, 5]
     if score >= 10:
-        shark_speed = [-5, -4, -3, -2, 2, 3, 4, 5]
+        shark_speed = [-4, -3, -2, 0, 2, 3, 4]
     if score >= 5:
-        shark_speed = [-4, -3, -2, 2, 3, 4]
+        shark_speed = [-3, -2, -1, 0, 1, 2, 3]
 
     change_direction_timer_shark +=1
     if change_direction_timer_shark >= change_direction_interval_shark:
@@ -267,19 +267,15 @@ while running:
         shark_image = pygame.transform.rotate(original_image2, 0)
 
     #Green fish movement
-    fish_speed = [-3, -2, 2, 3]
+    fish_speed = [-2, -1, 0, 1, 2,]
+    if score >= 40:
+        fish_speed = [-6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6]
     if score >= 30:
-        fish_speed = [-7, -6, -5, -4, 4, 5, 6, 7]
-    if score >= 25:
-        fish_speed = [-6, -5, -4, -3, 3, 4, 5, 6]
+        fish_speed = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
     if score >= 20:
-        fish_speed = [-5, -4, -3, 3, 4, 5]
-    if score >= 15:
-        fish_speed = [-5, -4, -3, -2, 2, 3, 4, 5]
+        fish_speed = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
     if score >= 10:
-        fish_speed = [-4, -3, -2, 2, 3, 4]
-    if score >= 5:
-        fish_speed = [-3, -2, 2, 3,]
+        fish_speed = [-3, -2, -1, 0, 1, 2, 3]
 
     change_direction_timer_green +=1
     if change_direction_timer_green >= change_direction_interval_green:
