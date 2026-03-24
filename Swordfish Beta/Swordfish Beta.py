@@ -5,15 +5,7 @@
 #I think that I would like to use pygame on this one somehow
 
 #Next steps
-#Make the shark be able to move
-#Make there be multiple sharks
-#Make the shark/swordfish have collision points
-#Make the shark die if it is the tip of the sword, have the swordfish die if anything else
-#Make a counter that keeps track of how many sharks you killed
-#Make orange, yellow, and red fish that follow shark principles that you do not want to kill (the fish cannot kill swordfish though)
-#-3 points for killing a fish
-#Make a bomb button that kills everything, could help your score, could hurt
-#End the game/maybe restart when a shark kills you
+#Optimize the code as it is definitely not efficient currently
 
 #General game stuff
 import pygame
