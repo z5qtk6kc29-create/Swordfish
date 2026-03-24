@@ -480,11 +480,6 @@ while running:
     score_text = font.render(f'Score: {score}', True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
 
-    #pygame.draw.rect(screen, (255, 255, 0), swordfish_hitbox_rect, 2)
-    #pygame.draw.rect(screen, (255, 0, 0), sword_rect, 2)
-    #pygame.draw.rect(screen, (255, 255, 0), green_fish_hitbox_rect, 2)
-    #pygame.draw.rect(screen, (255, 0, 0), shark_hitbox_rect, 2)
-
     pygame.display.flip()
 
 pygame.quit()
