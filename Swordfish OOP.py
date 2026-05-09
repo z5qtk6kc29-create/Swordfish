@@ -93,28 +93,80 @@ change_direction_interval_shark = 60
 
 shark_hitbox_rect = shark_rect.inflate(-50, -50)
 
-class Fish:
-    def __init__(self, color, image, x, y, timer, interval, alive):
+class Fish(pygame.sprite.Sprite):
+    def __init__(self, color, image, interval):
+        super().__init__()
+
+        self.raw_image = pygame.image.load(image)
+        self.image = pygame.transform.scale(self.raw_image, (75, 75))
+        self.rect = self.image.get_rect()
+        self.rect.center = (random.uniform(50, 700), random.uniform(50, 700))
+
         self.color = color
-        self.image = image
-        self.x = x
-        self.y = y
-        self.timer = timer
         self.interval = interval
-        self.alive = alive
+        self.timer = 0
+        self.alive = True
+        self.hitbox = self.rect.inflate(-20, -20)
 
-    def create_image(self, image):
-        drawing = pygame.image.load(image)
-        drawing = pygame.transform.scale(drawing, (75, 75))
-        drawing_copy = drawing.copy()
-        rect = drawing_copy.get_rect()
-        rect.center = (random.uniform(50, 700), random.uniform(50, 700))
-        hitbox = rect.inflate(-20, -20)
+    def update(self, score):
+        fish_speed = [-2, -1, 0, 1, 2,]
+        if score >= 40:
+            fish_speed = [-6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6]
+        elif score >= 30:
+            fish_speed = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+        elif score >= 20:
+            fish_speed = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+        else:
+            fish_speed = [-3, -2, -1, 0, 1, 2, 3]
 
-green = Fish("green", 'green_fish.png', 0, 0, 0, 0, 60, True)
-yellow = Fish("yellow", 'yellow_fish.png', 0, 0, 0, 0, 60, True)
-orange = Fish("orange", 'orange_fish.png', 0, 0, 0, 0, 60, True)
-red = Fish("red", 'red_fish.png', 0, 0, 0, 0, 60, True)
+        self.timer +=1
+        if self.timer >= self.interval:
+            self.change_x = random.choice(fish_speed)
+            self.change_y = random.choice(fish_speed)
+            self.timer = 0
+
+        self.rect.x += self.change_x
+        self.rect.y += self.change_y
+
+        if self.rect.left < -50 or self.rect.right > SCREEN_WIDTH:
+            self.rect.x *= -2
+        if self.rect.top < -50 or self.rect.bottom > SCREEN_WIDTH:
+            self.rect.y *= -2
+
+        if self.rect.y > 0 and self.rect.x == 0:
+            self.image = pygame.transform.rotate(self.image, 90)
+        elif self.rect.y == 0 and self.rect.x > 0:
+            self.image = pygame.transform.rotate(self.image, 180)
+        elif self.rect.y == 0 and self.rect.x < 0:
+            self.image = pygame.transform.rotate(self.image, 0)
+        elif self.rect.y < 0 and self.rect.x == 0:
+            self.image = pygame.transform.rotate(self.image, 270)
+        elif self.rect.y > 0 and self.rect.x > 0:
+            self.image = pygame.transform.rotate(self.image, 135)
+        elif self.rect.y < 0 and self.rect.x < 0:
+            self.image = pygame.transform.rotate(self.image, 315)
+        elif self.rect.y > 0 and self.rect.x < 0:
+            self.image = pygame.transform.rotate(self.image, 45)
+        elif self.rect.y < 0 and self.rect.x > 0:
+            self.image = pygame.transform.rotate(self.image, 225)
+        elif self.rect.y == 0 and self.rect.x == 0:
+            self.image = pygame.transform.rotate(self.image, 0)
+        else:
+            pass
+
+
+fish_colors = [
+    ("green", "green_fish.png")
+    ("yellow", "yellow_fish.png")
+    ("orange", "orange_fish.png")
+    ("red", "red_fish.png")
+]
+
+all_fish = pygame.sprite.Group()
+
+for color, img in fish_colors:
+    new_fish = Fish(color, img, 60)
+    all_fish.add(new_fish)
 
 running = True
 while running:
@@ -218,164 +270,7 @@ while running:
         shark_image = pygame.transform.rotate(original_image2, 0)
 
     #Fish movement
-    fish_speed = [-2, -1, 0, 1, 2,]
-    if score >= 40:
-        fish_speed = [-6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6]
-    if score >= 30:
-        fish_speed = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
-    if score >= 20:
-        fish_speed = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-    if score >= 10:
-        fish_speed = [-3, -2, -1, 0, 1, 2, 3]
-
-    Fish.timer +=1
-    if Fish.timer >= Fish.interval:
-        Fish.x = random.choice(fish_speed)
-        Fish.y = random.choice(fish_speed)
-        Fish.timer = 0
-
-    Fish.rect.x += Fish.x
-    Fish.rect.y += Fish.y
-
-    if Fish.rect.left < -50 or Fish.rect.right > SCREEN_WIDTH:
-        velocity_x_green *= -1.5
-    if Fish.rect.top < -50 or Fish.rect.bottom > SCREEN_WIDTH:
-        velocity_y_green *= -1.5
-
-    if Fish.y > 0 and Fish.x == 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 90)
-    if Fish.y == 0 and Fish.x > 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 180)
-    if Fish.y == 0 and Fish.x < 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 0)
-    if Fish.y < 0 and Fish.x == 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 270)
-    if Fish.y > 0 and Fish.x > 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 135)
-    if Fish.y < 0 and Fish.x < 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 315)
-    if Fish.y > 0 and Fish.x < 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 45)
-    if Fish.y < 0 and Fish.x > 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 225)
-    if Fish.y == 0 and Fish.x == 0:
-        green_fish_image = pygame.transform.rotate(original_image3, 0)
-
-    #Yellow fish specific movement
-    change_direction_timer_yellow +=1
-    if change_direction_timer_yellow >= change_direction_interval_yellow:
-        velocity_x_yellow = random.choice(fish_speed)
-        velocity_y_yellow = random.choice(fish_speed)
-        change_direction_timer_yellow = 0
-
-    yellow_fish_rect.x += velocity_x_yellow
-    yellow_fish_rect.y += velocity_y_yellow
-
-    if yellow_fish_rect.left < -50 or yellow_fish_rect.right > SCREEN_WIDTH:
-        velocity_x_yellow *= -1.5
-    if yellow_fish_rect.top < -50 or yellow_fish_rect.bottom > SCREEN_WIDTH:
-        velocity_y_yellow *= -1.5
-
-    if velocity_y_yellow > 0 and velocity_x_yellow == 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 90)
-    if velocity_y_yellow == 0 and velocity_x_yellow > 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 180)
-    if velocity_y_yellow == 0 and velocity_x_yellow < 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 0)
-    if velocity_y_yellow < 0 and velocity_x_yellow == 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 270)
-    if velocity_y_yellow > 0 and velocity_x_yellow > 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 135)
-    if velocity_y_yellow < 0 and velocity_x_yellow < 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 315)
-    if velocity_y_yellow > 0 and velocity_x_yellow < 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 45)
-    if velocity_y_yellow < 0 and velocity_x_yellow > 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 225)
-    if velocity_y_yellow == 0 and velocity_x_yellow == 0:
-        yellow_fish_image = pygame.transform.rotate(original_image4, 0)
-
-    #Red fish specific movement
-    change_direction_timer_red +=1
-    if change_direction_timer_red >= change_direction_interval_red:
-        velocity_x_red = random.choice(fish_speed)
-        velocity_y_red = random.choice(fish_speed)
-        change_direction_timer_red = 0
-
-    red_fish_rect.x += velocity_x_red
-    red_fish_rect.y += velocity_y_red
-
-    if red_fish_rect.left < -50 or red_fish_rect.right > SCREEN_WIDTH:
-        velocity_x_red *= -1.5
-    if red_fish_rect.top < -50 or red_fish_rect.bottom > SCREEN_WIDTH:
-        velocity_y_red *= -1.5
-
-    if velocity_y_red > 0 and velocity_x_red == 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 90)
-    if velocity_y_red == 0 and velocity_x_red > 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 180)
-    if velocity_y_red == 0 and velocity_x_red < 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 0)
-    if velocity_y_red < 0 and velocity_x_red == 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 270)
-    if velocity_y_red > 0 and velocity_x_red > 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 135)
-    if velocity_y_red < 0 and velocity_x_red < 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 315)
-    if velocity_y_red > 0 and velocity_x_red < 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 45)
-    if velocity_y_red < 0 and velocity_x_red > 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 225)
-    if velocity_y_red == 0 and velocity_x_red == 0:
-        red_fish_image = pygame.transform.rotate(original_image5, 0)
-
-    #Orange fish specific movement
-    change_direction_timer_orange +=1
-    if change_direction_timer_orange >= change_direction_interval_orange:
-        velocity_x_orange = random.choice(fish_speed)
-        velocity_y_orange = random.choice(fish_speed)
-        change_direction_timer_orange = 0
-
-    orange_fish_rect.x += velocity_x_orange
-    orange_fish_rect.y += velocity_y_orange
-
-    if orange_fish_rect.left < -50 or orange_fish_rect.right > SCREEN_WIDTH:
-        velocity_x_orange *= -1.5
-    if orange_fish_rect.top < -50 or orange_fish_rect.bottom > SCREEN_WIDTH:
-        velocity_y_orange *= -1.5
-
-    if velocity_y_orange > 0 and velocity_x_orange == 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 90)
-    if velocity_y_orange == 0 and velocity_x_orange > 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 180)
-    if velocity_y_orange == 0 and velocity_x_orange < 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 0)
-    if velocity_y_orange < 0 and velocity_x_orange == 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 270)
-    if velocity_y_orange > 0 and velocity_x_orange > 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 135)
-    if velocity_y_orange < 0 and velocity_x_orange < 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 315)
-    if velocity_y_orange > 0 and velocity_x_orange < 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 45)
-    if velocity_y_orange < 0 and velocity_x_orange > 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 225)
-    if velocity_y_orange == 0 and velocity_x_orange == 0:
-        orange_fish_image = pygame.transform.rotate(original_image6, 0)
-
-    #Update all rects
-    swordfish_rect.topleft = (swordfish_rect.x, swordfish_rect.y)
-    shark_rect.topleft = (shark_rect.x, shark_rect.y)
-    green_fish_rect.topleft = (green_fish_rect.x, green_fish_rect.y)
-    yellow_fish_rect.topleft = (yellow_fish_rect.x, yellow_fish_rect.y)
-    red_fish_rect.topleft = (red_fish_rect.x, red_fish_rect.y)
-    orange_fish_rect.topleft = (orange_fish_rect.x, orange_fish_rect.y)
-
-    shark_hitbox_rect.bottomright = shark_rect.bottomright
-    green_fish_hitbox_rect.bottomright = green_fish_rect.bottomright
-    yellow_fish_hitbox_rect.bottomright = yellow_fish_rect.bottomright
-    red_fish_hitbox_rect.bottomright = red_fish_rect.bottomright
-    orange_fish_hitbox_rect.bottomright = orange_fish_rect.bottomright
+    all_fish.update(score)
 
     #Revive
     if shark_alive == False and current_time - respawn_time_shark > 3000:
@@ -423,18 +318,7 @@ while running:
 
     #Actually render the game
     screen.blit(background_image, (0, 0))
-    if swordfish_alive == True:
-        screen.blit(swordfish_image, swordfish_rect)
-    if shark_alive == True:
-        screen.blit(shark_image, shark_rect)
-    if green_fish_alive == True:
-        screen.blit(green_fish_image, green_fish_rect)
-    if yellow_fish_alive == True:
-        screen.blit(yellow_fish_image, yellow_fish_rect)
-    if red_fish_alive == True:
-        screen.blit(red_fish_image, red_fish_rect)
-    if orange_fish_alive == True:
-        screen.blit(orange_fish_image, orange_fish_rect)
+    all_fish.draw(screen)
 
     score_text = font.render(f'Score: {score}', True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
