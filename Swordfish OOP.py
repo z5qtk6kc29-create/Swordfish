@@ -1,7 +1,7 @@
 #Swordfish OOP
 
 #Rewrite large portions of the code with Object-Oriented Programming to be more concise and understandable
-#Also, figure out why it doesn't run correctly on Fedora
+#Also, figure out why it doesn't run correctly on Fedora would be good
 
 #General game stuff
 import pygame
