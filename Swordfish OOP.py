@@ -93,69 +93,28 @@ change_direction_interval_shark = 60
 
 shark_hitbox_rect = shark_rect.inflate(-50, -50)
 
-#Green Fish
-original_image3 = pygame.image.load('green_fish.png')
-original_image3 = pygame.transform.scale(original_image3, (75, 75))
-green_fish_image = original_image3.copy()
-green_fish_rect = green_fish_image.get_rect()
-green_fish_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
+class Fish:
+    def __init__(self, color, image, x, y, timer, interval, alive):
+        self.color = color
+        self.image = image
+        self.x = x
+        self.y = y
+        self.timer = timer
+        self.interval = interval
+        self.alive = alive
 
-velocity_x_green = 0
-velocity_y_green = 0
-change_direction_timer_green = 0
-change_direction_interval_green = 60
+    def create_image(self, image):
+        drawing = pygame.image.load(image)
+        drawing = pygame.transform.scale(drawing, (75, 75))
+        drawing_copy = drawing.copy()
+        rect = drawing_copy.get_rect()
+        rect.center = (random.uniform(50, 700), random.uniform(50, 700))
+        hitbox = rect.inflate(-20, -20)
 
-green_fish_hitbox_rect = green_fish_rect.inflate(-20, -20)
-
-green_fish_alive = True
-
-#Yellow Fish
-original_image4 = pygame.image.load('yellow_fish.png')
-original_image4 = pygame.transform.scale(original_image4, (75, 75))
-yellow_fish_image = original_image4.copy()
-yellow_fish_rect = yellow_fish_image.get_rect()
-yellow_fish_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
-
-velocity_x_yellow = 0
-velocity_y_yellow = 0
-change_direction_timer_yellow = 0
-change_direction_interval_yellow = 60
-
-yellow_fish_hitbox_rect = yellow_fish_rect.inflate(-20, -20)
-
-yellow_fish_alive = True
-
-#Red Fish
-original_image5 = pygame.image.load('red_fish.png')
-original_image5 = pygame.transform.scale(original_image5, (75, 75))
-red_fish_image = original_image5.copy()
-red_fish_rect = red_fish_image.get_rect()
-red_fish_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
-
-velocity_x_red = 0
-velocity_y_red = 0
-change_direction_timer_red = 0
-change_direction_interval_red = 60
-
-red_fish_hitbox_rect = red_fish_rect.inflate(-20, -20)
-
-red_fish_alive = True
-
-#Orange Fish
-original_image6 = pygame.image.load('orange_fish.png')
-original_image6 = pygame.transform.scale(original_image6, (75, 75))
-orange_fish_image = original_image6.copy()
-orange_fish_rect = orange_fish_image.get_rect()
-orange_fish_rect.center = (random.uniform(50, 700), random.uniform(50, 700))
-
-velocity_x_orange = 0
-velocity_y_orange = 0
-change_direction_timer_orange = 0
-change_direction_interval_orange = 60
-
-orange_fish_hitbox_rect = orange_fish_rect.inflate(-20, -20)
-
-orange_fish_alive = True
+green = Fish("green", 'green_fish.png', 0, 0, 0, 0, 60, True)
+yellow = Fish("yellow", 'yellow_fish.png', 0, 0, 0, 0, 60, True)
+orange = Fish("orange", 'orange_fish.png', 0, 0, 0, 0, 60, True)
+red = Fish("red", 'red_fish.png', 0, 0, 0, 0, 60, True)
 
 running = True
 while running:
@@ -258,7 +217,7 @@ while running:
     if velocity_y_shark == 0 and velocity_x_shark == 0:
         shark_image = pygame.transform.rotate(original_image2, 0)
 
-    #Green fish movement
+    #Fish movement
     fish_speed = [-2, -1, 0, 1, 2,]
     if score >= 40:
         fish_speed = [-6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6]
@@ -269,37 +228,37 @@ while running:
     if score >= 10:
         fish_speed = [-3, -2, -1, 0, 1, 2, 3]
 
-    change_direction_timer_green +=1
-    if change_direction_timer_green >= change_direction_interval_green:
-        velocity_x_green = random.choice(fish_speed)
-        velocity_y_green = random.choice(fish_speed)
-        change_direction_timer_green = 0
+    Fish.timer +=1
+    if Fish.timer >= Fish.interval:
+        Fish.x = random.choice(fish_speed)
+        Fish.y = random.choice(fish_speed)
+        Fish.timer = 0
 
-    green_fish_rect.x += velocity_x_green
-    green_fish_rect.y += velocity_y_green
+    Fish.rect.x += Fish.x
+    Fish.rect.y += Fish.y
 
-    if green_fish_rect.left < -50 or green_fish_rect.right > SCREEN_WIDTH:
+    if Fish.rect.left < -50 or Fish.rect.right > SCREEN_WIDTH:
         velocity_x_green *= -1.5
-    if green_fish_rect.top < -50 or green_fish_rect.bottom > SCREEN_WIDTH:
+    if Fish.rect.top < -50 or Fish.rect.bottom > SCREEN_WIDTH:
         velocity_y_green *= -1.5
 
-    if velocity_y_green > 0 and velocity_x_green == 0:
+    if Fish.y > 0 and Fish.x == 0:
         green_fish_image = pygame.transform.rotate(original_image3, 90)
-    if velocity_y_green == 0 and velocity_x_green > 0:
+    if Fish.y == 0 and Fish.x > 0:
         green_fish_image = pygame.transform.rotate(original_image3, 180)
-    if velocity_y_green == 0 and velocity_x_green < 0:
+    if Fish.y == 0 and Fish.x < 0:
         green_fish_image = pygame.transform.rotate(original_image3, 0)
-    if velocity_y_green < 0 and velocity_x_green == 0:
+    if Fish.y < 0 and Fish.x == 0:
         green_fish_image = pygame.transform.rotate(original_image3, 270)
-    if velocity_y_green > 0 and velocity_x_green > 0:
+    if Fish.y > 0 and Fish.x > 0:
         green_fish_image = pygame.transform.rotate(original_image3, 135)
-    if velocity_y_green < 0 and velocity_x_green < 0:
+    if Fish.y < 0 and Fish.x < 0:
         green_fish_image = pygame.transform.rotate(original_image3, 315)
-    if velocity_y_green > 0 and velocity_x_green < 0:
+    if Fish.y > 0 and Fish.x < 0:
         green_fish_image = pygame.transform.rotate(original_image3, 45)
-    if velocity_y_green < 0 and velocity_x_green > 0:
+    if Fish.y < 0 and Fish.x > 0:
         green_fish_image = pygame.transform.rotate(original_image3, 225)
-    if velocity_y_green == 0 and velocity_x_green == 0:
+    if Fish.y == 0 and Fish.x == 0:
         green_fish_image = pygame.transform.rotate(original_image3, 0)
 
     #Yellow fish specific movement
