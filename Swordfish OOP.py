@@ -4,10 +4,11 @@
 #Also, figure out why it doesn't run correctly on Fedora would be good
 
 #General game stuff
+import os
+os.environ['PYGAME_DETECT_AVX2'] = '1'
 import pygame
 import sys
 import random
-import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
