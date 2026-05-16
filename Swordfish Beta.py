@@ -30,8 +30,6 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 FPS = 60
 
-numberx = [50, 700]
-numbery = [50, 700]
 
 #Background
 background_image = pygame.image.load('background.png')
