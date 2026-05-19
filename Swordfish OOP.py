@@ -44,16 +44,14 @@ class Swordfish(pygame.sprite.Sprite):
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.speed = 5
         self.alive = True
+        self.current_angle = 0
         
         # --- Hitboxes ---
         # Body Hitbox (Inflated to be smaller than the image)
         self.hitbox = self.rect.inflate(-60, -60)
         
         # Sword Hitbox (Separate tracking rectangle)
-        self.sword_rect = pygame.Rect(0, 0, 30, 30)
-        
-        # --- Movement and Rotation Math ---
-        self.current_angle = 0
+        self.sword_hitbox = pygame.Rect(0, 0, 30, 30)
         
         # Your exact dictionary offsets
         d1_straight = 25
@@ -103,16 +101,15 @@ class Swordfish(pygame.sprite.Sprite):
         # 3. Synchronize all internal Hitboxes using your offsets
         self.hitbox.center = self.rect.center
         
-        # Update your sword_rect position based on current angle offsets
+        # Update your sword_hitbox position based on current angle offsets
         off1 = self.offsets1[self.current_angle]
         off2 = self.offsets2[self.current_angle]
         
-        self.sword_rect.centerx = self.rect.centerx + off1[0] + off2[0]
-        self.sword_rect.centery = self.rect.centery + off1[1] + off2[1]
+        self.sword_hitbox.centerx = self.rect.centerx + off1[0] + off2[0]
+        self.sword_hitbox.centery = self.rect.centery + off1[1] + off2[1]
 
 player = Swordfish()
-player_group = pygame.sprite.GroupSingle()
-player_group.add(player)
+player_group = pygame.sprite.GroupSingle(player)
 
 #Shark
 class Shark(pygame.sprite.Sprite):
@@ -131,21 +128,16 @@ class Shark(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(-50, -50)
         self.change_x = 0
         self.change_y = 0
+        self.current_angle = 0
 
     def update(self, score):
-        shark_speed = [-2, -1, 0, 1, 2]
-        if score >= 30:
-            shark_speed = [-7, -6, -5, -4, 0, 4, 5, 6, 7]
-        if score >= 25:
-            shark_speed = [-6, -5, -4, -3, 0, 3, 4, 5, 6]
-        if score >= 20:
-            shark_speed = [-5, -4, -3, 0, 3, 4, 5]
-        if score >= 15:
-            shark_speed = [-5, -4, -3, -2, 0, 2, 3, 4, 5]
-        if score >= 10:
-            shark_speed = [-4, -3, -2, 0, 2, 3, 4]
-        if score >= 5:
-            shark_speed = [-3, -2, -1, 0, 1, 2, 3]
+        if score >= 30: shark_speed = [-7, -6, -5, -4, 0, 4, 5, 6, 7]
+        if score >= 25: shark_speed = [-6, -5, -4, -3, 0, 3, 4, 5, 6]
+        if score >= 20: shark_speed = [-5, -4, -3, 0, 3, 4, 5]
+        if score >= 15: shark_speed = [-5, -4, -3, -2, 0, 2, 3, 4, 5]
+        if score >= 10: shark_speed = [-4, -3, -2, 0, 2, 3, 4]
+        if score >= 5: shark_speed = [-3, -2, -1, 0, 1, 2, 3]
+        else: shark_speed = [-2, -1, 0, 1, 2]
 
         self.timer +=1
         if self.timer >= self.interval:
@@ -157,32 +149,24 @@ class Shark(pygame.sprite.Sprite):
         self.rect.y += self.change_y
 
         if self.rect.left < -50 or self.rect.right > SCREEN_WIDTH:
-            self.rect.x *= -1
+            self.change_x *= -1
         if self.rect.top < -50 or self.rect.bottom > SCREEN_WIDTH:
-            self.rect.y *= -1
+            self.change_y *= -1
 
-        if self.rect.y > 0 and self.rect.x == 0:
-            self.image = pygame.transform.rotate(self.original_image, 90)
-        elif self.rect.y == 0 and self.rect.x > 0:
-            self.image = pygame.transform.rotate(self.original_image, 180)
-        elif self.rect.y == 0 and self.rect.x < 0:
-            self.image = pygame.transform.rotate(self.original_image, 0)
-        elif self.rect.y < 0 and self.rect.x == 0:
-            self.image = pygame.transform.rotate(self.original_image, 270)
-        elif self.rect.y > 0 and self.rect.x > 0:
-            self.image = pygame.transform.rotate(self.original_image, 135)
-        elif self.rect.y < 0 and self.rect.x < 0:
-            self.image = pygame.transform.rotate(self.original_image, 315)
-        elif self.rect.y > 0 and self.rect.x < 0:
-            self.image = pygame.transform.rotate(self.original_image, 45)
-        elif self.rect.y < 0 and self.rect.x > 0:
-            self.image = pygame.transform.rotate(self.original_image, 225)
-        elif self.rect.y == 0 and self.rect.x == 0:
-            self.image = pygame.transform.rotate(self.original_image, 0)
-        else:
-            pass
+        if self.change_y > 0 and self.change_x == 0: self.current_angle = 90
+        elif self.change_y == 0 and self.change_x > 0: self.current_angle = 180
+        elif self.change_y == 0 and self.change_x < 0: self.current_angle = 0
+        elif self.change_y < 0 and self.change_x == 0: self.current_angle = 270
+        elif self.change_y > 0 and self.change_x > 0: self.current_angle = 135
+        elif self.change_y < 0 and self.change_x < 0: self.current_angle = 315
+        elif self.change_y > 0 and self.change_x < 0: self.current_angle = 45
+        elif self.change_y < 0 and self.change_x > 0: self.current_angle = 225
+        elif self.change_y == 0 and self.change_x == 0: self.current_angle = 0
+
+        self.image = pygame.transform.rotate(self.original_image, self.current_angle)
 
 shark = Shark("shark.png", 60)
+shark_group = pygame.sprite.GroupSingle(shark)
 
 class Fish(pygame.sprite.Sprite):
     def __init__(self, color, image, interval):
@@ -201,17 +185,13 @@ class Fish(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(-20, -20)
         self.change_x = 0
         self.change_y = 0
+        self.current_angle = 0
 
     def update(self, score):
-        fish_speed = [-2, -1, 0, 1, 2,]
-        if score >= 40:
-            fish_speed = [-6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6]
-        elif score >= 30:
-            fish_speed = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
-        elif score >= 20:
-            fish_speed = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-        else:
-            fish_speed = [-3, -2, -1, 0, 1, 2, 3]
+        if score >= 40: fish_speed = [-6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6]
+        elif score >= 30: fish_speed = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+        elif score >= 20: fish_speed = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+        else: fish_speed = [-2, -1, 0, 1, 2,]
 
         self.timer +=1
         if self.timer >= self.interval:
@@ -223,31 +203,21 @@ class Fish(pygame.sprite.Sprite):
         self.rect.y += self.change_y
 
         if self.rect.left < -50 or self.rect.right > SCREEN_WIDTH:
-            self.rect.x *= -1
+            self.change_x *= -1
         if self.rect.top < -50 or self.rect.bottom > SCREEN_WIDTH:
-            self.rect.y *= -1
+            self.change_y *= -1
 
-        if self.rect.y > 0 and self.rect.x == 0:
-            self.image = pygame.transform.rotate(self.original_image, 90)
-        elif self.rect.y == 0 and self.rect.x > 0:
-            self.image = pygame.transform.rotate(self.original_image, 180)
-        elif self.rect.y == 0 and self.rect.x < 0:
-            self.image = pygame.transform.rotate(self.original_image, 0)
-        elif self.rect.y < 0 and self.rect.x == 0:
-            self.image = pygame.transform.rotate(self.original_image, 270)
-        elif self.rect.y > 0 and self.rect.x > 0:
-            self.image = pygame.transform.rotate(self.original_image, 135)
-        elif self.rect.y < 0 and self.rect.x < 0:
-            self.image = pygame.transform.rotate(self.original_image, 315)
-        elif self.rect.y > 0 and self.rect.x < 0:
-            self.image = pygame.transform.rotate(self.original_image, 45)
-        elif self.rect.y < 0 and self.rect.x > 0:
-            self.image = pygame.transform.rotate(self.original_image, 225)
-        elif self.rect.y == 0 and self.rect.x == 0:
-            self.image = pygame.transform.rotate(self.original_image, 0)
-        else:
-            pass
+        if self.change_y > 0 and self.change_x == 0: self.current_angle = 90
+        elif self.change_y == 0 and self.change_x > 0: self.current_angle = 180
+        elif self.change_y == 0 and self.change_x < 0: self.current_angle = 0
+        elif self.change_y < 0 and self.change_x == 0: self.current_angle = 270
+        elif self.change_y > 0 and self.change_x > 0: self.current_angle = 135
+        elif self.change_y < 0 and self.change_x < 0: self.current_angle = 315
+        elif self.change_y > 0 and self.change_x < 0: self.current_angle = 45
+        elif self.change_y < 0 and self.change_x > 0: self.current_angle = 225
+        elif self.change_y == 0 and self.change_x == 0: self.current_angle = 0
 
+        self.image = pygame.transform.rotate(self.original_image, self.current_angle)
 
 fish_colors = [
     ("green", "green_fish.png"),
@@ -257,11 +227,12 @@ fish_colors = [
 ]
 
 all_fish = pygame.sprite.Group()
+master_fish_list = []
 
 for color, img in fish_colors:
-    fish = Fish(color, img, 60)
-    all_fish.add(fish)
-    all_fish.add(shark)
+    new_fish = Fish(color, img, 60)
+    all_fish.add(new_fish)
+    master_fish_list.append(new_fish)
 
 running = True
 while running:
@@ -269,43 +240,46 @@ while running:
     clock.tick(FPS)
     current_time = pygame.time.get_ticks()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        
-
     #Fish movement
     player_group.update()
     all_fish.update(score)
+    shark_group.update(score)
 
     #Revive
     if shark.alive == False and current_time - shark.time > 3000:
         shark.alive = True
-    if fish.alive == False and current_time - fish.time > 20000:
-        fish.alive = True
+    
+    for fish in master_fish_list:
+        if not fish.alive == True and current_time - fish.time > 20000:
+                fish.alive = True
+                all_fish.add(fish)
     
     #Collisions
-    if shark.alive == True and player.alive == True and player.hitbox.colliderect(shark.hitbox):
+    if shark.alive == True and player.alive == True and player.sword_hitbox.colliderect(shark.hitbox):
         shark.kill()
         shark.time = current_time
         score += 1
-    if player.rect.colliderect(shark.hitbox) and shark.alive == True:
+    if player.hitbox.colliderect(shark.hitbox) and shark.alive == True:
         player.kill()
-        pygame.quit()
-    if fish.alive == True and player.alive == True and player.hitbox.colliderect(fish.hitbox):
-        fish.alive = False
-        fish.kill()
-        fish.time = current_time
-        minus_score = [1, 2, 3, 4]
-        score -= random.choice(minus_score)
+        running = False
+    for fish in all_fish:
+        if fish.alive == True and player.alive == True and player.hitbox.colliderect(fish.hitbox):
+            fish.alive = False
+            fish.kill()
+            fish.time = current_time
+            score -= random.choice([1,2,3,4])
 
     #Fish importance
-    if len(all_fish) == 1 and shark.alive == True:
-        pygame.quit()
+    if len(all_fish) == 0 and shark.alive == True:
+        running = False
 
     #Actually render the game
     screen.blit(background_image, (0, 0))
-    all_fish.draw(screen)
+    for fish in all_fish:
+        if fish.alive: screen.blit(fish.image, fish.rect)
+    if shark.alive: 
+        screen.blit(shark.image, shark.rect)
+    
     player_group.draw(screen)
 
     score_text = font.render(f'Score: {score}', True, (255, 255, 255))
@@ -313,5 +287,5 @@ while running:
 
     pygame.display.flip()
 
-pygame.quit()
+running = False
 sys.exit()
